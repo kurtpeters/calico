@@ -62,9 +62,7 @@
         return Calico.apply({}, [this].concat(mixins));
     }
 
-    Backbone.Calico = function() {
-        return Calico.apply(this, arguments);
-    };
+    Backbone.Calico = Calico;
 
     _.each(['Collection', 'Model', 'Router', 'View'], function(property) {
         var BackboneProperty = Backbone[property],
