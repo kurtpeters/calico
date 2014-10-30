@@ -1,9 +1,11 @@
 var gulp = require('gulp'),
     concat = require('gulp-concat'),
-    uglify = require('gulp-uglify');
+    uglify = require('gulp-uglify'),
+    qunit = require('gulp-qunit');
 
 var files = {
-    src: 'src/calico.js'
+    "src": 'src/calico.js',
+    "test": 'tests/index.html'
 };
 
 gulp.task('build', function() {
@@ -11,4 +13,9 @@ gulp.task('build', function() {
     .pipe(concat('calico.min.js'))
     .pipe(uglify())
     .pipe(gulp.dest('./'));
+});
+
+gulp.task('test', function() {
+    return gulp.src(files.test)
+    .pipe(qunit());
 });
