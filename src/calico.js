@@ -3,7 +3,7 @@
 
     var registeredMixins = {};
 
-    function fuseProperties(property, mixin) {
+    function fuseProperties(property, mixin, reversed) {
 
         if (!property || !mixin) {
             return property ? property : mixin;
@@ -14,6 +14,7 @@
                    (method ? mixin[method] : mixin) instanceof instance;
         }
 
+        // fuse function properties
         if (insatceOf(Function)) {
             return function() {
                 mixin.apply(this, arguments);
@@ -21,23 +22,26 @@
             };
         }
 
+        // fuse array properties
         if (insatceOf(Function, 'sort')) {
-            return property.concat(mixin);
+            return reversed ? mixin.concat(property) : property.concat(mixin);
         }
 
+        // fuse object properties
         if (insatceOf(Object)) {
             for (var instance in mixin) {
-                property[instance] = fuseProperties(property[instance], mixin[instance]);
+                property[instance] = fuseProperties(property[instance], mixin[instance], reversed);
             }
             return property;
         }
 
-        return mixin;
+        return reversed ? property : mixin;
     }
 
     function Calico(context) {
         var mixins = Array.prototype.slice.call(arguments, 1),
             pseudoContext = {},
+            reversed = false,
             pseudoProperty,
             property,
             method,
@@ -45,6 +49,12 @@
 
         if (context instanceof Function) {
             context = context.prototype || context;
+        }
+
+        // reverse mixins to keep assignment order
+        if (mixins.length - 1) {
+            mixins.reverse();
+            reversed = true;
         }
 
         for (property in mixins) {
@@ -55,11 +65,11 @@
                 mixin = registeredMixins[mixin] || {};
             }
 
-            // invoke functional mixin with context
+            // invoke functional mixin with pseudo instance and fuse with context
             if (mixin instanceof Function) {
                 mixin.call(pseudoContext);
                 for (pseudoProperty in pseudoContext) {
-                    context[pseudoProperty] = fuseProperties(context[pseudoProperty], pseudoContext[pseudoProperty]);
+                    context[pseudoProperty] = fuseProperties(context[pseudoProperty], pseudoContext[pseudoProperty], reversed);
                 }
                 pseudoContext = {};
                 continue;
@@ -67,7 +77,7 @@
 
             // extend context with mixin properties
             for (method in mixin) {
-                context[method] = fuseProperties(context[method], mixin[method], context);
+                context[method] = fuseProperties(context[method], mixin[method], reversed);
             }
         }
 
@@ -85,13 +95,33 @@
         }
 
         for (property in mixins) {
-            registeredMixins[property] = fuseProperties(registeredMixins[property], mixins[property]);
+            registeredMixins[property] = mixins[property];
         }
     };
 
-    if (Backbone === void 0) {
+    Calico.deregisterMixin = function(name) {
+        if (name === void 0) {
+            registeredMixins = {};
+            return;
+        }
+        registeredMixins[name] = null;
+        delete registeredMixins[name];
+    };
+
+    if (root.Backbone === void 0) {
+
+        if (root.exports !== void 0) {
+            root.exports.Calico = Calico;
+            return;
+        }
+
+        if (root.require !== void 0) {
+            define('calico', function() { return Calico; });
+            return;
+        }
+
         root.Calico = Calico;
-        return root;
+        return;
     }
 
     function calicoMixinWrapper() {
@@ -102,26 +132,27 @@
         return Calico.apply({}, [this].concat(mixins));
     }
 
-    Backbone.Calico = Calico;
+    root.Backbone.Calico = Calico;
 
     _.each(['Collection', 'Model', 'Router', 'View'], function(property) {
-        var BackboneProperty = Backbone[property],
-            _originalExtendMethod = BackboneProperty.extend;
+        var BackboneProperty = root.Backbone[property],
+            originalExtendMethod = BackboneProperty.extend;
 
         _.extend(BackboneProperty, {
 
             "mixin": calicoMixinWrapper,
 
             "extend": function(properties) {
+                var mixins;
 
                 if (properties instanceof Object && properties.mixins !== void 0) {
-                    var mixins = properties.mixins.reverse();
+                    mixins = properties.mixins;
                     properties.mixins = null;
                     delete properties.mixins;
                     calicoMixinWrapper.apply(properties, mixins);
                 }
 
-                return _originalExtendMethod.apply(this, arguments);
+                return originalExtendMethod.apply(this, arguments);
             }
 
         });
