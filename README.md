@@ -8,12 +8,12 @@ bower install calico
 
 ###Why use calico?
 
-Using Backbone for production environments has great advantages over vanilla JavaScript. It provides structural standards for routing, service handling, and removes our truth from the DOM. Most experiences I’ve encountered with Backbone (and native JavaScript) have been destructive, overriding one property at a time. Extending the library allows new instances to adopt parent functionality, but it comes at a cost. Since JS is a prototypal language, redefining parent properties during inheritance will remove intended functionality, and since JavaScript lacks proper class inheritance, referencing super methods is nothing but a pain.
+Using Backbone for production environments has great advantages over vanilla JavaScript. It provides structural standards for routing, service handling, and removes our truth from the DOM. Many experiences I’ve had with Backbone (and native JavaScript) are nothing but destructive. Extending the library allows new instances to adopt parent functionality with the cost of overriding one property after another. Since JS is a prototypal language, redefining parent properties during inheritance will remove reusable functionality, and since JavaScript lacks proper class inheritance, referencing super methods is nothing but a pain.
 
-Thats where calico.js comes in. This lightweight library provides constructive functionality mixin after mixin. Calico introduces infused properties. What are infused properties? When a mixin is added to an instance, It’ll act as the parent instance, but instead of overriding inherited properties, it unleashes a hybrid.
+Thats where calico.js comes in. This lightweight library provides constructive functionality mixin after mixin. Calico introduces fusion properties. What are fusion properties? When a mixin is added to an extension, It’ll act as the parent instance, but instead of overriding inherited properties, it unleashes a hybrid!
 
 ___*When I create mixins to adopt specific patterns …*___
-```javascipt
+```javascript
 var createTypeMixin = {
     “initialize”: function() {
         this.type = ‘fusion’;
