@@ -195,11 +195,11 @@ __Seeing it in action__
 ```javascript
 var model = new MixinModel();
 
+// returns: {firstName: 'John', lastName: 'Wayne', fullName: 'John Wayne'}
 model.toJSON({
     “computed”: true
 });
-// returns: {firstName: 'John', lastName: 'Wayne', fullName: 'John Wayne'}
 
-model.toJSON();
 // returns: {firstName: 'John', lastName: 'Wayne'}
+model.toJSON();
 ```
