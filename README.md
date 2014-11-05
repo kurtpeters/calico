@@ -179,7 +179,7 @@ var MixinModel = Backbone.Model.extend({
 
     “mixins”: [‘model:computed’],
 
-    “attributes”: {
+    “defaults”: {
         "firstName": 'John',
         "lastName": 'Wayne',
         "fullName": '__computed__'
