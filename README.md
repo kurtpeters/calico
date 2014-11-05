@@ -107,7 +107,7 @@ MixinModel.mixin(mixin);
 
 ###Register Mixins
 
-If working in AMD or dealing with any module definition, using and reusing mixins is like butta. When a mixin becomes registered, any Backbone instance has reference to it’s source. To apply a mixin from the calico registry to a new Backbone instance, wrap it’s declaration in string literal.
+If working in AMD or dealing with any module pattern, using and reusing mixins is like butta. When a mixin becomes registered, any Backbone instance has reference to it’s source. To apply a mixin from the calico registry to a new Backbone instance, wrap it’s declaration in string literal.
 
 >**Note:** An object argument can be used to register multiple mixins.
 
@@ -191,15 +191,15 @@ var MixinModel = Backbone.Model.extend({
 
 });
 ```
-__Seeing it in action__
+__End result__
 ```javascript
 var model = new MixinModel();
 
-// returns: {firstName: 'John', lastName: 'Wayne', fullName: 'John Wayne'}
-model.toJSON({
+console.log(model.attributes); // {firstName: 'John', lastName: 'Wayne'}
+
+model.toJSON({ // returns: {firstName: 'John', lastName: 'Wayne', fullName: 'John Wayne'}
     “computed”: true
 });
 
-// returns: {firstName: 'John', lastName: 'Wayne'}
-model.toJSON();
+model.toJSON(); // returns: {firstName: 'John', lastName: 'Wayne'}
 ```
