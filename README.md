@@ -137,10 +137,11 @@ var MixinModel = Backbone.Model.extend({
 
 ===
 
-###Example
+###Example - Computed Properties Mixin
 
-```
-Backbone.Calico.registerMixin(‘computedProperties’, function() {
+__Registering the mixin__
+```javascript
+Backbone.Calico.registerMixin(‘model:computed’, function() {
 
     var computed = {};
 
@@ -156,25 +157,27 @@ Backbone.Calico.registerMixin(‘computedProperties’, function() {
     };
 
     this.toJSON = function(options) {
-        var toJSON = _.clone(this.attributes),
+        var attributes = _.clone(this.attributes),
             value;
 
         if (options.calculated) {
             _(computed).each(function(property) {
                 value = this[property];
-                toJSON[property] = value instanceof Function ? value() : value;
+                attributes[property] = value instanceof Function ? value() : value;
             }, this);
         }
 
-        return toJSON;
+        return attributes;
     };
 
 });
 ```
-```
+
+__Using the mixin__
+```javascript
 var MixinModel = Backbone.Model.extend({
 
-    “mixins”: [‘computedProperties’],
+    “mixins”: [‘model:computed’],
 
     “attributes”: {
         "firstName": 'John',
@@ -188,13 +191,11 @@ var MixinModel = Backbone.Model.extend({
 
 });
 ```
-```
+__Seeing it in action__
+```javascript
 var model = new MixinModel();
 
 model.toJSON({
     “computed”: true
 }); // returns: {firstName: 'John', lastName: 'Wayne', fullName: 'John Wayne'}
 ```
-
-
-
