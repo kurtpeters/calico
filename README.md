@@ -141,16 +141,16 @@ var MixinModel = Backbone.Model.extend({
 
 __Registering the mixin__
 ```javascript
-Backbone.Calico.registerMixin(‘model:computed’, function() {
+Backbone.Calico.registerMixin('model:computed', function() {
 
-    var computed = {};
+    var computed = [];
 
     this.initialize = function() {
         var attributes = this.toJSON();
 
         for (var attribute in attributes) {
             if (attributes[attribute].toLowerCase() === '__computed__') {
-                computed[attribute] = attributes[attribute];
+                computed.push(attribute);
                 delete this.attributes[attribute];
             }
         }
@@ -160,10 +160,10 @@ Backbone.Calico.registerMixin(‘model:computed’, function() {
         var attributes = _.clone(this.attributes),
             value;
 
-        if (options.calculated) {
+        if (options && options.calculated) {
             _(computed).each(function(property) {
                 value = this[property];
-                attributes[property] = value instanceof Function ? value() : value;
+                attributes[property] = value instanceof Function ? value.call(this) : value;
             }, this);
         }
 
@@ -177,16 +177,16 @@ __Using the mixin__
 ```javascript
 var MixinModel = Backbone.Model.extend({
 
-    “mixins”: [‘model:computed’],
+    "mixins": ['model:computed'],
 
-    “defaults”: {
+    "defaults": {
         "firstName": 'John',
         "lastName": 'Wayne',
         "fullName": '__computed__'
     },
 
-    “fullName”: function() {
-        return this.get(‘firstName’) + ‘ ‘ + this.get(‘lastName’);
+    "fullName": function() {
+        return this.get('firstName') + ' ' + this.get('lastName');
     }
 
 });
@@ -198,7 +198,7 @@ var model = new MixinModel();
 console.log(model.attributes); // {firstName: 'John', lastName: 'Wayne'}
 
 model.toJSON({ // returns: {firstName: 'John', lastName: 'Wayne', fullName: 'John Wayne'}
-    “computed”: true
+    "computed": true
 });
 
 model.toJSON(); // returns: {firstName: 'John', lastName: 'Wayne'}
