@@ -107,7 +107,7 @@ MixinModel.mixin(mixin);
 
 ###Register Mixins
 
-If working in AMD or dealing with any module pattern, using and reusing mixins is like butta. When a mixin becomes registered, any Backbone instance has reference to it’s source. To apply a mixin from the calico registry to a new Backbone instance, wrap it’s declaration in string literal.
+If working in AMD or dealing with any module pattern, using and reusing mixins is like butta. When a mixin becomes registered, any Backbone instance has reference to it’s source. To apply a mixin from the calico registry to a new instance, wrap it’s declaration in a string literal.
 
 >**Note:** An object argument can be used to register multiple mixins.
 
