@@ -1,6 +1,8 @@
 calico
 ======
 Backbone mixins for models, views, controllers, and routers! Oh, my!
+
+###Bower installation
 ```
 bower install calico
 ```
@@ -40,6 +42,8 @@ ___*Calico will combine the identical methods into a single experience.*___
 ```javascript
 new MixinView(); // logs: “fusion instance!”
 ```
+
+===
 
 ###Usage
 
