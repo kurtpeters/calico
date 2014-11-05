@@ -197,5 +197,9 @@ var model = new MixinModel();
 
 model.toJSON({
     “computed”: true
-}); // returns: {firstName: 'John', lastName: 'Wayne', fullName: 'John Wayne'}
+});
+// returns: {firstName: 'John', lastName: 'Wayne', fullName: 'John Wayne'}
+
+model.toJSON();
+// returns: {firstName: 'John', lastName: 'Wayne'}
 ```
