@@ -140,19 +140,34 @@ var MixinModel = Backbone.Model.extend({
 ###Example
 
 ```
-Backbone.Calico.registerMixin(‘computedProperties’, {
+Backbone.Calico.registerMixin(‘computedProperties’, function() {
 
-    "toJSONC": function() {        
-        var attributes = {};
+    var computed = {};
 
-        _(this.computed).each(function(property) {
-            if (this[property] instanceof Function) {
-                attributes[property] = this[property]();
+    this.initialize = function() {
+        var attributes = this.toJSON();
+
+        for (var attribute in attributes) {
+            if (attributes[attribute].toLowerCase() === '__computed__') {
+                computed[attribute] = attributes[attribute];
+                delete this.attributes[attribute];
             }
-        }, this);
+        }
+    };
 
-        return _.extend(this.toJSON(), attributes);
-    }
+    this.toJSON = function(options) {
+        var toJSON = _.clone(this.attributes),
+            value;
+
+        if (options.calculated) {
+            _(computed).each(function(property) {
+                value = this[property];
+                toJSON[property] = value instanceof Function ? value() : value;
+            }, this);
+        }
+
+        return toJSON;
+    };
 
 });
 ```
@@ -162,11 +177,10 @@ var MixinModel = Backbone.Model.extend({
     “mixins”: [‘computedProperties’],
 
     “attributes”: {
-        “firstName”: 'John',
-        “lastName”: 'Wayne'
+        "firstName": 'John',
+        "lastName": 'Wayne',
+        "fullName": '__computed__'
     },
-
-    “computed”: [‘fullName’],
 
     “fullName”: function() {
         return this.get(‘firstName’) + ‘ ‘ + this.get(‘lastName’);
@@ -176,7 +190,10 @@ var MixinModel = Backbone.Model.extend({
 ```
 ```
 var model = new MixinModel();
-model.toJSONC(); // {firstName: 'John', lastName: 'Wayne', fullName: 'John Wayne'}
+
+model.toJSON({
+    “computed”: true
+}); // returns: {firstName: 'John', lastName: 'Wayne', fullName: 'John Wayne'}
 ```
 
 
