@@ -119,7 +119,7 @@ Backbone.Calico.registerMixin(‘computedProperties’, {
             }
         }, this);
 
-        return _.extend(this.toJSON, attributes);
+        return _.extend(this.toJSON(), attributes);
     }
 
 });
