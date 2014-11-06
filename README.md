@@ -12,37 +12,39 @@ bower install calico
 
 Using Backbone for production environments has great advantages over vanilla JavaScript. It provides structural standards for routing, service handling, and removes our truth from the DOM. Many experiences with the library (along with native JavaScript) can be destructive. Extending allows new instances to adopt parent functionality, but comes at the cost of overriding one parent property after another. Since JS is a prototypal language, redefining parent properties during inheritance will eliminate reusable functionality, and since JavaScript lacks proper class inheritance, referencing super methods becomes nothing but a painful process.
 
-Thats where calico.js comes in. This lightweight library provides constructive functionality mixin after mixin. calico introduces fusion properties. What is a fused property? When a mixin is added during extension, It acts as a parent instance, but instead of these inherited properties being overridden... a hybrid is unleashed!
+Thats where calico.js comes in. This lightweight library provides constructive functionality mixin after mixin. calico introduces fusion properties. What is a fused property? When a mixin is added during extension, it acts as a parent, but instead of being overwritten by child properties, they become channeled into a hybrid instance.
 
-__*When I create mixins to adopt specific patterns …*__
+> **Note:** Backbone’s native extension functionality is intact. Instead of a parents prototype chain becoming fused, a mixin record is kept and applied to the new instance.
+
+__For example, when I create mixins to adopt specific patterns …__
 ```javascript
 var createTypeMixin = {
 
-    “initialize”: function() {
+    "initialize": function() {
         this.type = ‘fusion’;
     }
 
 };
 ```
 
-__*… and override the parental properties.*__
+__… and override the parental properties.__
 ```javascript
 var MixinView = Backbone.View.extend({
     
-    “mixins”: [createTypeMixin],
+    "mixins": [createTypeMixin],
 
-    “initialize”: function() {
+    "initialize": function() {
         console.log(this.type + ‘ instance!’);
     },
 
-    “type”: ‘basic’
+    "type": ‘basic’
 
 });
 ```
 
-__*calico will combine the identical methods into a single experience.*__
+__calico will combine identical methods into a single experience.__
 ```javascript
-new MixinView(); // logs: “fusion instance!”
+new MixinView(); // logs: "fusion instance!"
 ```
 
 ===
@@ -55,7 +57,7 @@ __Object mixins__
 ```javascript
 var mixin = {
 
-    “method”: function() {
+    "method": function() {
         console.log(this);
     }
 
@@ -85,7 +87,7 @@ __Mixins property__
 ```javascript
 var MixinModel = Backbone.Model.extend({
 
-    “mixins”: [mixin]
+    "mixins": [mixin]
 
 });
 ```
@@ -94,7 +96,7 @@ __Mixin instance method__
 ```javascript
 var MixinModel = Backbone.Model.extend({
 
-    “initialize”: function() {
+    "initialize": function() {
         ...
     }
 
@@ -105,7 +107,7 @@ MixinModel.mixin(mixin);
 
 ===
 
-###Register Mixins
+###The Mixin Registry
 
 If working in AMD or dealing with any module pattern, using and reusing mixins is like butta. When a mixin becomes registered, any Backbone instance has reference to it’s source. To apply a mixin from the calico registry to a new instance, wrap it’s declaration in a string literal.
 
@@ -115,8 +117,8 @@ __Creating a registered mixin__
 ```javascript
 Backbone.Calico.registerMixin(‘mixin:name’, {
 
-    “contents”: function() {
-        return “I’m registered!”;
+    "contents": function() {
+        return "I’m registered!";
     }
 
 });
@@ -126,10 +128,10 @@ __Using registered mixins__
 ```javascript
 var MixinModel = Backbone.Model.extend({
 
-    “mixins”: [‘mixin:name’],
+    "mixins": [‘mixin:name’],
 
-    “initialize”: function() {
-        console.log(this.contents()); // logs: “I’m registered!”
+    "initialize": function() {
+        console.log(this.contents()); // logs: "I’m registered!"
     }
 
 });
@@ -137,20 +139,22 @@ var MixinModel = Backbone.Model.extend({
 
 ===
 
-###Example - Computed Properties Mixin
+###Putting it all together
 
-__Registering the mixin__
+####Computed Properties
+
+__Mixin__
 ```javascript
-Backbone.Calico.registerMixin(‘model:computed’, function() {
+Backbone.Calico.registerMixin('model:computed', function() {
 
-    var computed = {};
+    var computed = [];
 
     this.initialize = function() {
         var attributes = this.toJSON();
 
         for (var attribute in attributes) {
             if (attributes[attribute].toLowerCase() === '__computed__') {
-                computed[attribute] = attributes[attribute];
+                computed.push(attribute);
                 delete this.attributes[attribute];
             }
         }
@@ -160,10 +164,10 @@ Backbone.Calico.registerMixin(‘model:computed’, function() {
         var attributes = _.clone(this.attributes),
             value;
 
-        if (options.calculated) {
+        if (options && options.calculated) {
             _(computed).each(function(property) {
                 value = this[property];
-                attributes[property] = value instanceof Function ? value() : value;
+                attributes[property] = value instanceof Function ? value.call(this) : value;
             }, this);
         }
 
@@ -173,33 +177,99 @@ Backbone.Calico.registerMixin(‘model:computed’, function() {
 });
 ```
 
-__Using the mixin__
+__Model__
 ```javascript
 var MixinModel = Backbone.Model.extend({
 
-    “mixins”: [‘model:computed’],
+    "mixins": ['model:computed'],
 
-    “defaults”: {
+    "defaults": {
         "firstName": 'John',
         "lastName": 'Wayne',
         "fullName": '__computed__'
     },
 
-    “fullName”: function() {
-        return this.get(‘firstName’) + ‘ ‘ + this.get(‘lastName’);
+    "fullName": function() {
+        return this.get('firstName') + ' ' + this.get('lastName');
     }
 
 });
 ```
-__End result__
+__Result__
 ```javascript
 var model = new MixinModel();
 
 console.log(model.attributes); // {firstName: 'John', lastName: 'Wayne'}
 
 model.toJSON({ // returns: {firstName: 'John', lastName: 'Wayne', fullName: 'John Wayne'}
-    “computed”: true
+    "computed": true
 });
 
 model.toJSON(); // returns: {firstName: 'John', lastName: 'Wayne'}
+```
+
+####Two-way Data Binding
+
+__Mixin__
+
+```javascript
+Backbone.Calico.registerMixin('view:mvvm', function() {
+
+    function syncTemplate(model) {
+        _(model.changed).each(function(value, property) {
+            this.$('[data-mvvm-view="' + property + '"]').html(value);
+        }, this);
+    }
+
+    function syncModel(e) {
+        var model = this.$(e.currentTarget),
+            property = model.data('mvvm-model'),
+            value = _.escape(model.val());
+
+        this.model.set(property, value);
+    }
+
+    this.events = {
+        'change [data-mvvm-model]': syncModel
+    };
+
+    this.initialize = function() {
+        this.listenToOnce(this, 'render:mvvm', function() {
+            this.listenTo(this.model, 'change', syncTemplate);
+        });
+    };
+
+    this.render = function(options) {
+        var attributes = this.model.toJSON(options);
+        this.$el.html(this.template(attributes));
+        return this.trigger('render:mvvm');
+    };
+
+});
+```
+
+__View__
+```javascript
+var MixinView = Backbone.View.extend({
+
+    "mixins": ['view:mvvm'],
+
+    "template": _.template(
+        '<input type="text" data-mvvm-model="content" value="<%=content %>" /> ' +
+        '<span data-mvvm-view="content"><%=content %></span>'
+    ),
+
+    "initialize": function() {
+        this.model = new Backbone.Model({
+            "content": "Chuck Norris vs. ThunderDOM"
+        });
+    }
+
+});
+```
+
+__Result__
+```javascript
+var view = new MixinView();
+$(document.body).append(view.render().el);
 ```
