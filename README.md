@@ -232,7 +232,7 @@ Backbone.Calico.registerMixin('view:mvvm', function() {
     };
 
     this.initialize = function() {
-        this.listenToOnce(this, 'render', function() {
+        this.listenToOnce(this, 'render:mvvm', function() {
             this.listenTo(this.model, 'change', syncTemplate);
         });
     };
@@ -240,7 +240,7 @@ Backbone.Calico.registerMixin('view:mvvm', function() {
     this.render = function(options) {
         var attributes = this.model.toJSON(options);
         this.$el.html(this.template(attributes));
-        return this.trigger('render');
+        return this.trigger('render:mvvm');
     };
 
 });
