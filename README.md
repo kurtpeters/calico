@@ -12,9 +12,9 @@ bower install calico
 
 Using Backbone for production environments has great advantages over vanilla JavaScript. It provides structural standards for routing, service handling, and removes our truth from the DOM. Many experiences with the library (along with native JavaScript) can be destructive. Extending allows new instances to adopt parent functionality, but comes at the cost of overriding one parent property after another. Since JS is a prototypal language, redefining parent properties during inheritance will eliminate reusable functionality, and since JavaScript lacks proper class inheritance, referencing super methods becomes nothing but a painful process.
 
-Thats where calico.js comes in. This lightweight library provides constructive functionality mixin after mixin. calico introduces fusion properties. What is a fused property? When a mixin is added during extension, It acts as a parent instance, but instead of these inherited properties being overridden... a hybrid is unleashed!
+Thats where calico.js comes in. This lightweight library provides constructive functionality mixin after mixin. calico introduces fusion properties. What is a fused property? When a mixin is added during extension, it acts as a parent, but instead of being overwritten by child properties, they become channeled into a hybrid instance.
 
-__*When I create mixins to adopt specific patterns …*__
+__For example, when I create mixins to adopt specific patterns …__
 ```javascript
 var createTypeMixin = {
 
@@ -25,7 +25,7 @@ var createTypeMixin = {
 };
 ```
 
-__*… and override the parental properties.*__
+__… and override the parental properties.__
 ```javascript
 var MixinView = Backbone.View.extend({
     
@@ -40,7 +40,7 @@ var MixinView = Backbone.View.extend({
 });
 ```
 
-__*calico will combine the identical methods into a single experience.*__
+__calico will combine the identical methods into a single experience.__
 ```javascript
 new MixinView(); // logs: "fusion instance!"
 ```
