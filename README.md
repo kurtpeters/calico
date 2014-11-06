@@ -14,6 +14,8 @@ Using Backbone for production environments has great advantages over vanilla Jav
 
 Thats where calico.js comes in. This lightweight library provides constructive functionality mixin after mixin. calico introduces fusion properties. What is a fused property? When a mixin is added during extension, it acts as a parent, but instead of being overwritten by child properties, they become channeled into a hybrid instance.
 
+> **Note:** Backbone’s native extension functionality is intact. Instead of a parents prototype chain becoming fused, a mixin record is kept and applied to the new instance.
+
 __For example, when I create mixins to adopt specific patterns …__
 ```javascript
 var createTypeMixin = {
@@ -40,7 +42,7 @@ var MixinView = Backbone.View.extend({
 });
 ```
 
-__calico will combine the identical methods into a single experience.__
+__calico will combine identical methods into a single experience.__
 ```javascript
 new MixinView(); // logs: "fusion instance!"
 ```
@@ -105,7 +107,7 @@ MixinModel.mixin(mixin);
 
 ===
 
-###Register Mixins
+###The Mixin Registry
 
 If working in AMD or dealing with any module pattern, using and reusing mixins is like butta. When a mixin becomes registered, any Backbone instance has reference to it’s source. To apply a mixin from the calico registry to a new instance, wrap it’s declaration in a string literal.
 
@@ -193,7 +195,7 @@ var MixinModel = Backbone.Model.extend({
 
 });
 ```
-__End result__
+__Result__
 ```javascript
 var model = new MixinModel();
 
@@ -266,7 +268,7 @@ var MixinView = Backbone.View.extend({
 });
 ```
 
-__End result__
+__Result__
 ```javascript
 var view = new MixinView();
 $(document.body).append(view.render().el);
