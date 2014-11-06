@@ -18,7 +18,7 @@ __*When I create mixins to adopt specific patterns …*__
 ```javascript
 var createTypeMixin = {
 
-    “initialize”: function() {
+    "initialize": function() {
         this.type = ‘fusion’;
     }
 
@@ -29,20 +29,20 @@ __*… and override the parental properties.*__
 ```javascript
 var MixinView = Backbone.View.extend({
     
-    “mixins”: [createTypeMixin],
+    "mixins": [createTypeMixin],
 
-    “initialize”: function() {
+    "initialize": function() {
         console.log(this.type + ‘ instance!’);
     },
 
-    “type”: ‘basic’
+    "type": ‘basic’
 
 });
 ```
 
 __*calico will combine the identical methods into a single experience.*__
 ```javascript
-new MixinView(); // logs: “fusion instance!”
+new MixinView(); // logs: "fusion instance!"
 ```
 
 ===
@@ -55,7 +55,7 @@ __Object mixins__
 ```javascript
 var mixin = {
 
-    “method”: function() {
+    "method": function() {
         console.log(this);
     }
 
@@ -85,7 +85,7 @@ __Mixins property__
 ```javascript
 var MixinModel = Backbone.Model.extend({
 
-    “mixins”: [mixin]
+    "mixins": [mixin]
 
 });
 ```
@@ -94,7 +94,7 @@ __Mixin instance method__
 ```javascript
 var MixinModel = Backbone.Model.extend({
 
-    “initialize”: function() {
+    "initialize": function() {
         ...
     }
 
@@ -115,8 +115,8 @@ __Creating a registered mixin__
 ```javascript
 Backbone.Calico.registerMixin(‘mixin:name’, {
 
-    “contents”: function() {
-        return “I’m registered!”;
+    "contents": function() {
+        return "I’m registered!";
     }
 
 });
@@ -126,10 +126,10 @@ __Using registered mixins__
 ```javascript
 var MixinModel = Backbone.Model.extend({
 
-    “mixins”: [‘mixin:name’],
+    "mixins": [‘mixin:name’],
 
-    “initialize”: function() {
-        console.log(this.contents()); // logs: “I’m registered!”
+    "initialize": function() {
+        console.log(this.contents()); // logs: "I’m registered!"
     }
 
 });
@@ -137,9 +137,11 @@ var MixinModel = Backbone.Model.extend({
 
 ===
 
-###Example - Computed Properties Mixin
+###Putting it all together
 
-__Registering the mixin__
+####Computed Properties
+
+__Mixin__
 ```javascript
 Backbone.Calico.registerMixin('model:computed', function() {
 
@@ -173,7 +175,7 @@ Backbone.Calico.registerMixin('model:computed', function() {
 });
 ```
 
-__Using the mixin__
+__Model__
 ```javascript
 var MixinModel = Backbone.Model.extend({
 
@@ -202,4 +204,70 @@ model.toJSON({ // returns: {firstName: 'John', lastName: 'Wayne', fullName: 'Joh
 });
 
 model.toJSON(); // returns: {firstName: 'John', lastName: 'Wayne'}
+```
+
+####Two-way Data Binding
+
+__Mixin__
+
+```javascript
+Backbone.Calico.registerMixin('view:mvvm', function() {
+
+    function syncTemplate(model) {
+        _(model.changed).each(function(value, property) {
+            this.$('[data-mvvm-view="' + property + '"]').html(value);
+        }, this);
+    }
+
+    function syncModel(e) {
+        var model = this.$(e.currentTarget),
+            property = model.data('mvvm-model'),
+            value = _.escape(model.val());
+
+        this.model.set(property, value);
+    }
+
+    this.events = {
+        'change [data-mvvm-model]': syncModel
+    };
+
+    this.initialize = function() {
+        this.listenToOnce(this, 'render', function() {
+            this.listenTo(this.model, 'change', syncTemplate);
+        });
+    };
+
+    this.render = function(options) {
+        var attributes = this.model.toJSON(options);
+        this.$el.html(this.template(attributes));
+        return this.trigger('render');
+    };
+
+});
+```
+
+__View__
+```javascript
+var MixinView = Backbone.View.extend({
+
+    "mixins": ['view:mvvm'],
+
+    "template": _.template(
+        '<input type="text" data-mvvm-model="content" value="<%=content %>" /> ' +
+        '<span data-mvvm-view="content"><%=content %></span>'
+    ),
+
+    "initialize": function() {
+        this.model = new Backbone.Model({
+            "content": "Chuck Norris vs. ThunderDOM"
+        });
+    }
+
+});
+```
+
+__End result__
+```javascript
+var view = new MixinView();
+$(document.body).append(view.render().el);
 ```
