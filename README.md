@@ -19,8 +19,11 @@ __For example, when I create mixins to adopt specific patterns …__
 var createTypeMixin = {
 
     "initialize": function() {
-        this.type = ‘fusion’;
-    }
+        console.log(this.type);
+        this.type = 'fusion';
+    },
+    
+    "type": 'mixin'
 
 };
 ```
@@ -32,17 +35,17 @@ var MixinView = Backbone.View.extend({
     "mixins": [createTypeMixin],
 
     "initialize": function() {
-        console.log(this.type + ‘ instance!’);
+        console.log(this.type);
     },
 
-    "type": ‘basic’
+    "type": 'child'
 
 });
 ```
 
 __calico will combine identical methods into a single experience.__
 ```javascript
-new MixinView(); // logs: "fusion instance!"
+new MixinView(); // will log "child" and then "fusion"
 ```
 
 > **Note:** Backbone’s native extension functionality is intact. Instead of a parents prototype chain becoming fused, a mixin record is kept and applied to the new instance.
