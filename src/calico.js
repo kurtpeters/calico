@@ -9,13 +9,13 @@
             return property ? property : mixin;
         }
 
-        function insatceOf(instance, method) {
+        function instanceOf(instance, method) {
             return (method ? property[method] : property) instanceof instance &&
                    (method ? mixin[method] : mixin) instanceof instance;
         }
 
         // fuse function properties
-        if (insatceOf(Function)) {
+        if (instanceOf(Function)) {
             return function() {
                 mixin.apply(this, arguments);
                 return property.apply(this, arguments);
@@ -23,12 +23,12 @@
         }
 
         // fuse array properties
-        if (insatceOf(Function, 'sort')) {
+        if (instanceOf(Function, 'sort')) {
             return reversed ? mixin.concat(property) : property.concat(mixin);
         }
 
         // fuse object properties
-        if (insatceOf(Object)) {
+        if (instanceOf(Object)) {
             for (var instance in mixin) {
                 property[instance] = fuseProperties(property[instance], mixin[instance], reversed);
             }
