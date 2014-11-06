@@ -128,10 +128,14 @@
         if (!arguments.length) {
             return this;
         }
+
         var mixins = Array.prototype.slice.call(arguments);
         Calico.apply({}, [this].concat(mixins));
-        if (this.prototype) {
+
+        if (this.prototype !== void 0) {
             this.prototype.__mixins__ = _.union(this.prototype.__mixins__, mixins);
+        } else {
+            this.__mixins__ = mixins;
         }
     }
 
@@ -147,12 +151,13 @@
 
             "extend": function(properties) {
                 var mixins;
+
                 if (properties instanceof Object && properties.mixins !== void 0) {
                     mixins = _.union(this.prototype.__mixins__, properties.mixins.slice());
                     delete properties.mixins;
                     calicoMixinWrapper.apply(properties, mixins);
-                    properties.__mixins__ = mixins;
                 }
+
                 return originalExtendMethod.apply(this, arguments);
             }
 
