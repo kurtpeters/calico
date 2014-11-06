@@ -45,7 +45,7 @@ var MixinView = Backbone.View.extend({
 
 __calico will combine identical methods into a single experience.__
 ```javascript
-new MixinView(); // will log "child" and then "fusion"
+new MixinView(); // logs "child" followed by "fusion"
 ```
 
 > **Note:** Backbone’s native extension functionality is intact. Instead of a parents prototype chain becoming fused, a mixin record is kept and applied to the new instance.
