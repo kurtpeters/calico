@@ -56,7 +56,7 @@ new MixinView(); // logs "child" followed by "fusion"
 
 Mixins can be defined one of two ways. Either `object` literals extend their properties, or `functions` are invoked with a desired context.
 
-__Object mixins__
+__Object mixin__
 ```javascript
 var mixin = {
 
@@ -67,7 +67,7 @@ var mixin = {
 };
 ```
 
-__Functional mixins__
+__Functional mixin__
 ```javascript
 var mixin = function() {
 
