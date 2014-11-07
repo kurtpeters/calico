@@ -3,7 +3,7 @@
 
     var registeredMixins = {};
 
-    function fuseProperties(property, mixin, reversed) {
+    function fuseProperties(property, mixin) {
 
         if (!property || !mixin) {
             return property ? property : mixin;
@@ -24,24 +24,23 @@
 
         // fuse array properties
         if (instanceOf(Function, 'sort')) {
-            return reversed ? mixin.concat(property) : property.concat(mixin);
+            return mixin.concat(property);
         }
 
         // fuse object properties
         if (instanceOf(Object)) {
             for (var instance in mixin) {
-                property[instance] = fuseProperties(property[instance], mixin[instance], reversed);
+                property[instance] = fuseProperties(property[instance], mixin[instance]);
             }
             return property;
         }
 
-        return reversed ? property : mixin;
+        return property;
     }
 
     function Calico(context) {
         var mixins = Array.prototype.slice.call(arguments, 1),
             pseudoContext = {},
-            reversed = false,
             pseudoProperty,
             property,
             method,
@@ -54,7 +53,6 @@
         // reverse mixins to keep assignment order
         if (mixins.length - 1) {
             mixins.reverse();
-            reversed = true;
         }
 
         for (property in mixins) {
@@ -69,7 +67,7 @@
             if (mixin instanceof Function) {
                 mixin.call(pseudoContext);
                 for (pseudoProperty in pseudoContext) {
-                    context[pseudoProperty] = fuseProperties(context[pseudoProperty], pseudoContext[pseudoProperty], reversed);
+                    context[pseudoProperty] = fuseProperties(context[pseudoProperty], pseudoContext[pseudoProperty]);
                 }
                 pseudoContext = {};
                 continue;
@@ -77,7 +75,7 @@
 
             // extend context with mixin properties
             for (method in mixin) {
-                context[method] = fuseProperties(context[method], mixin[method], reversed);
+                context[method] = fuseProperties(context[method], mixin[method]);
             }
         }
 
@@ -129,10 +127,12 @@
             return this;
         }
 
-        var mixins = Array.prototype.slice.call(arguments);
+        var hasPrototype = this.prototype !== void 0,
+            mixins = Array.prototype.slice.call(arguments);
+
         Calico.apply({}, [this].concat(mixins));
 
-        if (this.prototype !== void 0) {
+        if (hasPrototype) {
             this.prototype.__mixins__ = _.union(this.prototype.__mixins__, mixins);
         } else {
             this.__mixins__ = mixins;

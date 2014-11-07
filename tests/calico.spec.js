@@ -45,8 +45,8 @@ describe('Calico', function() {
 
         fusion = calico(properties1, properties2);
         expect(fusion.block.length).to.equal(2);
-        expect(fusion.block[0]).to.equal('one');
-        expect(fusion.block[1]).to.equal('two');
+        expect(fusion.block[1]).to.equal('one');
+        expect(fusion.block[0]).to.equal('two');
     });
 
     it('should fuse object properties', function() {
@@ -121,8 +121,8 @@ describe('Calico', function() {
         expect(fusion.testNumber).to.equal(2);
 
         fusion = calico(properties1, properties2);
-        expect(fusion.testString).to.equal('test2');
-        expect(fusion.testNumber).to.equal(2);
+        expect(fusion.testNumber).to.equal(1);
+        expect(fusion.testString).to.equal('test1');
     });
 
     it('should assign to prototype chain for contextual funcitons', function() {
