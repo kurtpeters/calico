@@ -56,7 +56,7 @@ new MixinView(); // logs "child" followed by "fusion"
 
 Mixins can be defined one of two ways. Either `object` literals extend their properties, or `functions` are invoked with a desired context.
 
-__Object mixins__
+__Object mixin__
 ```javascript
 var mixin = {
 
@@ -67,7 +67,7 @@ var mixin = {
 };
 ```
 
-__Functional mixins__
+__Functional mixin__
 ```javascript
 var mixin = function() {
 
@@ -118,10 +118,18 @@ If working in AMD or dealing with any module pattern, using and reusing mixins i
 
 __Creating a registered mixin__
 ```javascript
-Backbone.Calico.registerMixin(‘mixin:name’, {
+var unregisteredMixin = {
 
-    "contents": function() {
-        return "I’m registered!";
+    "logContents": function() {
+        console.log(this.get('message'));
+    }
+
+};
+
+Backbone.Calico.registerMixin('registered:mixin', {
+
+    "defaults": {
+        "message": 'I’m registered!'
     }
 
 });
@@ -131,10 +139,10 @@ __Using registered mixins__
 ```javascript
 var MixinModel = Backbone.Model.extend({
 
-    "mixins": [‘mixin:name’],
+    "mixins": [unregisteredMixin, 'registered:mixin'],
 
     "initialize": function() {
-        console.log(this.contents()); // logs: "I’m registered!"
+        this.logContents(); // logs: "I’m registered!"
     }
 
 });
