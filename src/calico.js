@@ -95,6 +95,8 @@
         for (property in mixins) {
             registeredMixins[property] = mixins[property];
         }
+
+        return mixins;
     };
 
     Calico.deregisterMixin = function(name) {
@@ -153,7 +155,7 @@
                 var mixins;
 
                 if (properties instanceof Object && properties.mixins !== void 0) {
-                    mixins = _.union(this.prototype.__mixins__, properties.mixins.slice());
+                    mixins = _.union(this.prototype.__mixins__ || [], properties.mixins.slice());
                     delete properties.mixins;
                     calicoMixinWrapper.apply(properties, mixins);
                 }

@@ -1,5 +1,3 @@
-/*global describe:false, it:false, expect:false, beforeEach:false */
-
 var calico = require('../src/calico').Calico,
     expect = require('expect.js');
 
