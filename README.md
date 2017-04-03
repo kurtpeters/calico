@@ -2,13 +2,15 @@ calico
 ======
 Backbone mixins for models, views, controllers, and routers! Oh, my!
 
-###Bower installation
-```
+### Bower installation
+
+```bash
 bower install calico
 ```
-===
 
-###Why include calico?
+---
+
+### Why include calico?
 
 Using Backbone for production environments has great advantages over vanilla JavaScript. It provides structural standards for routing, service handling, and removes our truth from the DOM. Many experiences with the library (along with native JavaScript) can be destructive. Extending allows new instances to adopt parent functionality, but comes at the cost of overriding one parent property after another. Since JS is a prototypal language, redefining parent properties during inheritance will eliminate reusable functionality, and since JavaScript lacks proper class inheritance, referencing super methods becomes nothing but a painful process.
 
@@ -50,9 +52,9 @@ new MixinView(); // logs "child" followed by "fusion"
 
 > **Note:** Backbone’s native extension functionality is intact. Instead of a parents prototype chain becoming fused, a mixin record is kept and applied to the new instance.
 
-===
+---
 
-###Creating mixins
+### Creating mixins
 
 Mixins can be defined one of two ways. Either `object` literals extend their properties, or `functions` are invoked with a desired context.
 
@@ -78,9 +80,9 @@ var mixin = function() {
 };
 ```
 
-===
+---
 
-###Using mixins
+### Using mixins
 
 Mixins can also be applied one of two ways. Either a `mixins` property is assigned during extension, or a `mixin` instance method is available after extending.
 
@@ -108,9 +110,9 @@ var MixinModel = Backbone.Model.extend({
 MixinModel.mixin(mixin);
 ```
 
-===
+---
 
-###The Mixin Registry
+### The Mixin Registry
 
 If working in AMD or dealing with any module pattern, using and reusing mixins is like butta. When a mixin becomes registered, any Backbone instance has reference to it’s source. To apply a mixin from the calico registry to a new instance, wrap it’s declaration in a string literal.
 
@@ -148,11 +150,11 @@ var MixinModel = Backbone.Model.extend({
 });
 ```
 
-===
+---
 
-###Putting it all together
+### Putting it all together
 
-####Computed Properties
+#### Computed Properties
 
 __Mixin__
 ```javascript
@@ -206,6 +208,7 @@ var MixinModel = Backbone.Model.extend({
 
 });
 ```
+
 __Result__
 ```javascript
 var model = new MixinModel();
@@ -219,7 +222,7 @@ model.toJSON({ // returns: {firstName: 'John', lastName: 'Wayne', fullName: 'Joh
 model.toJSON(); // returns: {firstName: 'John', lastName: 'Wayne'}
 ```
 
-####Two-way Data Binding
+#### Two-way Data Binding
 
 __Mixin__
 
